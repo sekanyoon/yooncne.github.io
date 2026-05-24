@@ -1,9 +1,25 @@
 #!/usr/bin/env bash
 # GitHub Pages ??: https://github.com/sekanyoon/yooncne.github.io
 set -euo pipefail
-cd "$(dirname "$0")"
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT"
+export PATH="$ROOT/.local/bin:$PATH"
 
 REMOTE="https://github.com/sekanyoon/yooncne.github.io.git"
+
+# GitHub CLI ??? ??
+if ! command -v gh >/dev/null 2>&1; then
+  echo "GitHub CLI? ????. ?? ???? ???? ?????:"
+  echo "  ./setup-github-login.sh"
+  exit 1
+fi
+
+if ! gh auth status >/dev/null 2>&1; then
+  echo "GitHub? ????? ?? ????."
+  echo "  ./setup-github-login.sh"
+  echo "? ??? ? ?? ?????."
+  exit 1
+fi
 
 if ! git rev-parse --git-dir >/dev/null 2>&1; then
   git init
@@ -13,18 +29,13 @@ git remote remove origin 2>/dev/null || true
 git remote add origin "$REMOTE"
 git branch -M main
 
-if ! git rev-parse HEAD >/dev/null 2>&1; then
-  git add index.html css/ js/ assets/ .nojekyll README.md .gitignore
-  git commit -m "Add static portfolio site"
-fi
-
 echo "? GitHub? push ?..."
 git push -u origin main
 
 echo ""
-echo "??. GitHub?? Pages ??? ?????:"
+echo "??. Pages ??:"
 echo "  https://github.com/sekanyoon/yooncne.github.io/settings/pages"
-echo "  Source: Deploy from a branch ? main ? / (root)"
+echo "  (main ??? / root)"
 echo ""
-echo "??? URL (???? 1~2?):"
+echo "??? URL:"
 echo "  https://sekanyoon.github.io/yooncne.github.io/"
